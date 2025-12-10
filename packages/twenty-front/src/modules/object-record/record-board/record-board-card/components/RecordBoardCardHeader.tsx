@@ -24,15 +24,31 @@ import { ChipVariant } from 'twenty-ui/components';
 import { IconEye, IconEyeOff } from 'twenty-ui/display';
 import { Checkbox, CheckboxVariant, LightIconButton } from 'twenty-ui/input';
 
+const StyledHeaderHoverWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  align-items: center;
+  &:hover .compact-hover-control {
+    opacity: 1;
+    pointer-events: auto;
+  }
+`;
+
 const StyledCompactIconContainer = styled.div`
   align-items: center;
   display: flex;
   justify-content: center;
   margin-left: ${({ theme }) => theme.spacing(1)};
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
 `;
 
 const StyledCheckboxContainer = styled.div`
   margin-left: auto;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
 `;
 
 const StyledRecordChipContainer = styled.div`
@@ -79,50 +95,52 @@ export const RecordBoardCardHeader = () => {
 
   return (
     <RecordCardHeaderContainer isCompact={isCompactModeActive}>
-      <StyledRecordChipContainer>
-        <StopPropagationContainer>
-          {isDefined(record) && (
-            <RecordChip
-              objectNameSingular={objectMetadataItem.nameSingular}
-              record={record}
-              variant={ChipVariant.Transparent}
-              onClick={() => {
-                activateBoardCard({ rowIndex, columnIndex });
-                unfocusBoardCard();
-                openRecordFromIndexView({ recordId });
-              }}
-              triggerEvent={triggerEvent}
-            />
-          )}
-        </StopPropagationContainer>
-      </StyledRecordChipContainer>
-
-      {isCompactModeActive && (
-        <StyledCompactIconContainer className="compact-icon-container">
+      <StyledHeaderHoverWrapper>
+        <StyledRecordChipContainer>
           <StopPropagationContainer>
-            <LightIconButton
-              Icon={isCardExpanded ? IconEyeOff : IconEye}
-              accent="tertiary"
-              onClick={() => {
-                setIsCardExpanded(!isCardExpanded);
+            {isDefined(record) && (
+              <RecordChip
+                objectNameSingular={objectMetadataItem.nameSingular}
+                record={record}
+                variant={ChipVariant.Transparent}
+                onClick={() => {
+                  activateBoardCard({ rowIndex, columnIndex });
+                  unfocusBoardCard();
+                  openRecordFromIndexView({ recordId });
+                }}
+                triggerEvent={triggerEvent}
+              />
+            )}
+          </StopPropagationContainer>
+        </StyledRecordChipContainer>
+
+        {isCompactModeActive && (
+          <StyledCompactIconContainer className="compact-hover-control">
+            <StopPropagationContainer>
+              <LightIconButton
+                Icon={isCardExpanded ? IconEyeOff : IconEye}
+                accent="tertiary"
+                onClick={() => {
+                  setIsCardExpanded(!isCardExpanded);
+                }}
+              />
+            </StopPropagationContainer>
+          </StyledCompactIconContainer>
+        )}
+        <StyledCheckboxContainer className="compact-hover-control">
+          <StopPropagationContainer>
+            <Checkbox
+              hoverable
+              checked={isCurrentCardSelected}
+              onChange={(value) => {
+                setIsCurrentCardSelected(value.target.checked);
+                checkIfLastUnselectAndCloseDropdown();
               }}
+              variant={CheckboxVariant.Secondary}
             />
           </StopPropagationContainer>
-        </StyledCompactIconContainer>
-      )}
-      <StyledCheckboxContainer className="checkbox-container">
-        <StopPropagationContainer>
-          <Checkbox
-            hoverable
-            checked={isCurrentCardSelected}
-            onChange={(value) => {
-              setIsCurrentCardSelected(value.target.checked);
-              checkIfLastUnselectAndCloseDropdown();
-            }}
-            variant={CheckboxVariant.Secondary}
-          />
-        </StopPropagationContainer>
-      </StyledCheckboxContainer>
+        </StyledCheckboxContainer>
+      </StyledHeaderHoverWrapper>
     </RecordCardHeaderContainer>
   );
 };
